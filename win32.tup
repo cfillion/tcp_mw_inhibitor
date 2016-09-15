@@ -1,0 +1,22 @@
+# wrapper.bat selects which compiler to execute depending on the architecture
+WRAP := cmd /C wrapper.bat @(ARCH)
+
+CXX := $(WRAP) cl
+
+CXXFLAGS := /nologo /W3 /WX /wd4996 /EHsc /MT
+CXXFLAGS += /O2 /Z7 /Zo
+CXXFLAGS += /Ivendor /Ivendor/WDL /Ivendor/WDL/WDL
+CXXFLAGS += /Ivendor/libcurl@(SUFFIX)/include
+CXXFLAGS += /DWDL_NO_DEFINE_MINMAX /DNDEBUG
+
+LD := $(WRAP) link
+LDFLAGS := /nologo User32.lib
+LDFLAGS += /DEBUG /OPT:REF /PDBALTPATH:%_PDB%
+
+TARGET := bin/reaper_tcp_mw_inhibitor@(SUFFIX)
+
+SOFLAGS := /DLL /OUT:$(TUP_VARIANTDIR)/$(TARGET).dll
+SOTARGET := $(TARGET).dll $(TARGET).lib $(TARGET).exp
+
+!build = |> $(CXX) $(CXXFLAGS) /c %f /Fo%o |>
+!link = |> $(LD) $(LDFLAGS) %f |>
