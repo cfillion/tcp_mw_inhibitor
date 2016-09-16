@@ -4,12 +4,10 @@
 #define REAPERAPI_IMPLEMENT
 #include <reaper_plugin_functions.h>
 
-using namespace std;
-
-#define API_FUNC(name) {(void **)&name, #name}
-
 static HWND g_tcp = nullptr;
 static WNDPROC g_originalProc = nullptr;
+
+#define API_FUNC(name) {(void **)&name, #name}
 
 static bool loadAPI(void *(*getFunc)(const char *))
 {
@@ -20,7 +18,6 @@ static bool loadAPI(void *(*getFunc)(const char *))
     API_FUNC(GetMainHwnd),
     API_FUNC(GetMasterTrack),
     API_FUNC(GetMasterTrackVisibility),
-    API_FUNC(plugin_register),
     API_FUNC(SetMasterTrackVisibility),
     API_FUNC(Splash_GetWnd),
 
@@ -48,7 +45,7 @@ static bool loadAPI(void *(*getFunc)(const char *))
 
 WDL_DLGRET InhibitMWProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-  if(GetAsyncKeyState(VK_CONTROL) & 0x8000 && msg == WM_MOUSEWHEEL)
+  if(msg == WM_MOUSEWHEEL && GetAsyncKeyState(VK_CONTROL) & 0x8000)
     return false;
   else
     return g_originalProc(handle, msg, wParam, lParam);
@@ -91,7 +88,7 @@ extern "C" REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(
   if(!loadAPI(rec->GetFunc))
     return 0;
 
-  bool masterVisible = GetMasterTrackVisibility() > 0;
+  const bool masterVisible = GetMasterTrackVisibility() > 0;
 
   if(!masterVisible)
     SetMasterTrackVisibility(true);
