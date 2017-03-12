@@ -43,16 +43,34 @@ static bool loadAPI(void *(*getFunc)(const char *))
 
 #undef API_FUNC
 
-WDL_DLGRET InhibitMWProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-  if(msg == WM_MOUSEWHEEL && GetAsyncKeyState(VK_CONTROL) & 0x8000)
-    return false;
-  else
-    return g_originalProc(handle, msg, wParam, lParam);
-}
+class EnsureMasterIsVisible {
+public:
+  enum {
+    TCP = 1<<0,
+    // MCP = 1<<1,
+  };
+
+  EnsureMasterIsVisible()
+    : m_visibility(GetMasterTrackVisibility())
+  {
+    if(!visibleIn(TCP))
+      SetMasterTrackVisibility(m_visibility | TCP);
+  }
+
+  ~EnsureMasterIsVisible()
+  {
+    if(!visibleIn(TCP))
+      SetMasterTrackVisibility(m_visibility);
+  }
+
+private:
+  bool visibleIn(const int f) const { return (m_visibility & f) != 0; }
+  int m_visibility;
+};
 
 HWND findTcp()
 {
+  EnsureMasterIsVisible visibility;
   const void *master = static_cast<void *>(GetMasterTrack(nullptr));
 
   HWND mainWindow = GetMainHwnd();
@@ -74,6 +92,14 @@ HWND findTcp()
   return nullptr;
 }
 
+WDL_DLGRET InhibitMWProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+  if(msg == WM_MOUSEWHEEL && GetAsyncKeyState(VK_CONTROL) & 0x8000)
+    return false;
+  else
+    return g_originalProc(handle, msg, wParam, lParam);
+}
+
 extern "C" REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(
   REAPER_PLUGIN_HINSTANCE instance, reaper_plugin_info_t *rec)
 {
@@ -88,18 +114,7 @@ extern "C" REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(
   if(!loadAPI(rec->GetFunc))
     return 0;
 
-  const int masterVisilibity = GetMasterTrackVisibility();
-  const bool masterInTCP = (masterVisilibity & 1) != 0;
-
-  if(!masterInTCP)
-    SetMasterTrackVisibility(masterVisilibity | 1);
-
-  g_tcp = findTcp();
-
-  if(!masterInTCP)
-    SetMasterTrackVisibility(masterVisilibity);
-
-  if(!g_tcp)
+  if(!(g_tcp = findTcp()))
     return 0;
 
   g_originalProc = (WNDPROC)SetWindowLongPtr(g_tcp, GWLP_WNDPROC, (LONG_PTR)InhibitMWProc);
