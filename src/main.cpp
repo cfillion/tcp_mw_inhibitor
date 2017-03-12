@@ -88,15 +88,16 @@ extern "C" REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(
   if(!loadAPI(rec->GetFunc))
     return 0;
 
-  const bool masterVisible = GetMasterTrackVisibility() > 0;
+  const int masterVisilibity = GetMasterTrackVisibility();
+  const bool masterInTCP = (masterVisilibity & 1) != 0;
 
-  if(!masterVisible)
-    SetMasterTrackVisibility(true);
+  if(!masterInTCP)
+    SetMasterTrackVisibility(masterVisilibity | 1);
 
   g_tcp = findTcp();
 
-  if(!masterVisible)
-    SetMasterTrackVisibility(false);
+  if(!masterInTCP)
+    SetMasterTrackVisibility(masterVisilibity);
 
   if(!g_tcp)
     return 0;
