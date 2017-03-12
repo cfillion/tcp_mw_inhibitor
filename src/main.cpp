@@ -7,6 +7,12 @@
 static HWND g_tcp = nullptr;
 static WNDPROC g_originalProc = nullptr;
 
+static void fatalError(const char *msg)
+{
+  MessageBox(Splash_GetWnd ? Splash_GetWnd() : nullptr,
+    msg, "TCP Mousewheel Inhibitor - Fatal Error", MB_OK);
+}
+
 #define API_FUNC(name) {(void **)&name, #name}
 
 static bool loadAPI(void *(*getFunc)(const char *))
@@ -30,9 +36,7 @@ static bool loadAPI(void *(*getFunc)(const char *))
       char msg[1024] = {};
       snprintf(msg, sizeof(msg) * sizeof(char),
         "Unable to import the following API function: %s", func.name);
-
-      MessageBox(Splash_GetWnd ? Splash_GetWnd() : nullptr,
-        msg, "TCP Mousewheel Inhibitor – Fatal Error", MB_OK);
+      fatalError(msg);
 
       return false;
     }
@@ -108,16 +112,14 @@ extern "C" REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(
     return 0;
   }
 
-  if(rec->caller_version != REAPER_PLUGIN_VERSION || !rec->GetFunc)
+  if(rec->caller_version != REAPER_PLUGIN_VERSION || !rec->GetFunc || !loadAPI(rec->GetFunc))
     return 0;
 
-  if(!loadAPI(rec->GetFunc))
+  if(!(g_tcp = findTcp())) {
+    fatalError("Failed to locate the TCP inside of the REAPER window.");
     return 0;
-
-  if(!(g_tcp = findTcp()))
-    return 0;
+  }
 
   g_originalProc = (WNDPROC)SetWindowLongPtr(g_tcp, GWLP_WNDPROC, (LONG_PTR)InhibitMWProc);
-
   return 1;
 }
