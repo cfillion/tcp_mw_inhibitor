@@ -20,13 +20,12 @@ static bool loadAPI(void *(*getFunc)(const char *))
   struct ApiFunc { void **ptr; const char *name; };
 
   const ApiFunc funcs[] = {
+    API_FUNC(Splash_GetWnd),
 
     API_FUNC(GetMainHwnd),
     API_FUNC(GetMasterTrack),
     API_FUNC(GetMasterTrackVisibility),
     API_FUNC(SetMasterTrackVisibility),
-    API_FUNC(Splash_GetWnd),
-
   };
 
   for(const ApiFunc &func : funcs) {
