@@ -9,7 +9,7 @@ Download these files into the `vendor` directory:
 3. reaper_plugin_functions.h from the REAPER action
   "[developer] Write C++ API functions header"
 
-### OS X
+### macOS
 
 1. Install [Homebrew](http://brew.sh/) and Xcode Command Line Tools
 2. Install [tup](http://gittup.org/tup/):
