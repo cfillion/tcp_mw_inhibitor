@@ -23,7 +23,7 @@ Download these files into the `vendor` directory:
 1. Install [tup](http://gittup.org/tup/win32/tup-explicit-variant-v0.7.3-45-gcf6a829.zip)
   (explicit-variant branch, see [this
   thread](https://groups.google.com/d/topic/tup-users/UNUSE15PQdA/discussion))
-  and [Visual Studio 2015, with Visual C++](https://www.visualstudio.com/products/visual-studio-community-vs)
+  and [Visual Studio 2017, with C++ support](https://www.visualstudio.com/vs/community/)
 2. Prevent Microsoft's C++ compiler from saving telemetry outside of the build directory:
    [instructions here](https://msdn.microsoft.com/en-us/library/ee225238.aspx#Anchor_5)
    or set the `OptIn` registry key to `0` in

@@ -16,7 +16,7 @@ LDFLAGS += /DEBUG /OPT:REF /PDBALTPATH:%_PDB%
 TARGET := bin/reaper_tcp_mw_inhibitor@(SUFFIX)
 
 SOFLAGS := /DLL /OUT:$(TUP_VARIANTDIR)/$(TARGET).dll
-SOTARGET := $(TARGET).dll $(TARGET).lib $(TARGET).exp
+SOTARGET := $(TARGET).dll $(TARGET).pdb $(TARGET).lib $(TARGET).exp
 
 !build = |> $(CXX) $(CXXFLAGS) /c %f /Fo%o |>
 !link = |> $(LD) $(LDFLAGS) %f |>
