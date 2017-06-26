@@ -14,9 +14,8 @@ Download these files into the `vendor` directory:
 1. Install [Homebrew](http://brew.sh/) and Xcode Command Line Tools
 2. Install [tup](http://gittup.org/tup/):
   `brew tap homebrew/fuse && brew install tup`
-3. Apply cfillion/WDL@7bae0e33ac9ae7550f1c8c29ac00900f366bd3f7 to your WDL clone
-4. Run `tup` from this directory
-5. Copy or link `x64/bin/reaper_tcp_mw_inhibitor64.dylib` or `x86/bin/reaper_tcp_mw_inhibitor32.dylib`
+3. Run `tup` from this directory
+4. Copy or link `x64/bin/reaper_tcp_mw_inhibitor64.dylib` or `x86/bin/reaper_tcp_mw_inhibitor32.dylib`
    to REAPER's extension directory
 
 ### Windows
